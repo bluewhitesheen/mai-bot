@@ -1,0 +1,61 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.Python
+__pypackages__/
+
+# Installer / virtual environment
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# Dependency caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.tox/
+.nox/
+
+# Unit test / coverage
+.coverage
+.coverage.*
+htmlcov/
+
+# Logs
+*.log
+*.log.*
+logs/
+
+# Editors / IDE
+.vscode/
+.idea/
+*.suo
+*.swp
+*.swo
+
+# OS / system
+.DS_Store
+Thumbs.db
+*.tmp
+*~
+
+# Bot runtime / local config (Discord token, keys, etc.)
+.env*
+config.json
+secrets.json
+credentials.json
+*.sqlite3
+*.db
+*.db-journal
+
+# Local cache / temp
+*.cache

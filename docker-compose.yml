@@ -1,0 +1,10 @@
+services:
+  mai-bot:
+    build: .
+    container_name: mai-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data.json:/app/data.json:ro
+    command: ["python", "main.py"]
