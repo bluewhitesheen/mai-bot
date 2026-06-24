@@ -13,11 +13,23 @@ if [ ! -f docker-compose.yml ]; then
   exit 1
 fi
 
+if command -v docker-compose >/dev/null 2>&1; then
+  COMPOSE=(docker-compose)
+elif command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+  COMPOSE=(docker compose)
+else
+  echo "Error: docker compose is not available. Install Docker Compose."
+  exit 1
+fi
+
 echo "==> Building Docker image (no cache)"
-docker compose build --no-cache
+if ! "${COMPOSE[@]}" build --no-cache; then
+  echo "Warning: build with --no-cache failed. Retrying with normal cache."
+  "${COMPOSE[@]}" build
+fi
 
 echo "==> Starting container in detached mode"
-docker compose up -d
+"${COMPOSE[@]}" up -d
 
 echo "==> Done. Check status:"
-docker compose ps
+"${COMPOSE[@]}" ps
