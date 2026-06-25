@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_JSON = BASE_DIR / "data.json"
 
 
-def find_nd(keyword: str, json_path: Path = DATA_JSON) -> list:
+def find_nd(keyword: str, json_path: Path = DATA_JSON) -> list[str]:
     with open(json_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 

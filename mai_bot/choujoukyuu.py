@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_JSON = BASE_DIR / "data.json"
 
 
-def abbr_dif(sheet):
+def abbr_dif(sheet) -> str:
     d = ""
     match sheet.get("difficulty", ""):
         case "basic":
@@ -24,7 +24,7 @@ def abbr_dif(sheet):
     return d
 
 
-def MasterChoujoukyuu(json_path: Path = DATA_JSON) -> list:
+def MasterChoujoukyuu(json_path: Path = DATA_JSON) -> list[str]:
     with open(json_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 

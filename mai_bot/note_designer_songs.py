@@ -5,14 +5,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_JSON = BASE_DIR / "data.json"
 
 
-def get_level(sheet):
+def get_level(sheet) -> str:
     level = sheet.get("internalLevelValue")
     if level is None:
         level = sheet.get("level", "")
     return str(level)
 
 
-def abbr_dif(sheet):
+def abbr_dif(sheet) -> str:
     d = ""
     match sheet.get("difficulty", ""):
         case "basic":
@@ -30,7 +30,7 @@ def abbr_dif(sheet):
     return d
 
 
-def get_type(sheet):
+def get_type(sheet) -> str:
     t = sheet.get("type", "")
     if t == "std":
         return "ST"
@@ -39,14 +39,14 @@ def get_type(sheet):
     return "UNK"
 
 
-def format_song(song_name, sheet, nd):
+def format_song(song_name, sheet, nd) -> str:
     st_dx = get_type(sheet)
     difficulty = abbr_dif(sheet)
     level = get_level(sheet)
     return f"{nd} - {song_name} - {st_dx}/{difficulty}/{level}"
 
 
-def find_nds(keyword: str, json_path: Path = DATA_JSON) -> list:
+def find_nds(keyword: str, json_path: Path = DATA_JSON) -> list[str]:
     with open(json_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 

@@ -1,15 +1,14 @@
-import discord
-import json #o
-import os #o
+﻿import discord
 from dotenv import load_dotenv
 from discord.ext import commands
+
 from mai_bot.find_song import find_songs_by_keyword
 from mai_bot.choujoukyuu import MasterChoujoukyuu
 from mai_bot.randomsong import random_song
 from mai_bot.note_designer import find_nd
 from mai_bot.note_designer_songs import find_nds
+import os
 
-# 載入環境變數
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
@@ -17,41 +16,68 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+
 @bot.event
-async def on_ready():
-    print(f"✅ {bot.user}")
+async def on_ready() -> None:
+    print(f"??{bot.user}")
+
 
 @bot.command(aliases=["f"])
-async def find(ctx, *, keyword: str):
+async def find(ctx, *, keyword: str) -> None:
     results = find_songs_by_keyword(keyword)
     await ctx.reply("\n\n".join(results))
 
+
 @bot.command()
-async def 超上級(ctx):
+async def find_simple(ctx, *, keyword: str) -> None:
+    results = find_songs_by_keyword(keyword)
+    await ctx.reply("\n\n".join(results))
+
+
+@bot.command(aliases=["fme"])
+async def find_mas_exp(ctx, *, keyword: str) -> None:
+    results = find_songs_by_keyword(
+        keyword,
+        difficulty_filter={"Re:MAS", "MAS", "EXP"},
+    )
+    await ctx.reply("\n\n".join(results))
+
+@bot.command(aliases=["fm"])
+async def find_mas(ctx, *, keyword: str) -> None:
+    results = find_songs_by_keyword(
+        keyword,
+        difficulty_filter={"Re:MAS", "MAS"},
+    )
+    await ctx.reply("\n\n".join(results))
+
+
+@bot.command(name="超上級", aliases=["choujoukyuu", "cj"])
+async def choujoukyuu(ctx) -> None:
     results = MasterChoujoukyuu()
     await ctx.reply("\n".join(results))
 
+
 @bot.command()
-async def random(ctx):
+async def random(ctx) -> None:
     results = random_song()
     await ctx.reply(results)
 
-# 找譜師
+
 @bot.command()
-async def nd(ctx, *, keyword: str):
+async def nd(ctx, *, keyword: str) -> None:
     results = find_nd(keyword)
     await ctx.reply("\n".join(results))
 
-# 列出譜師和歌曲資訊
+
 @bot.command()
-async def nds(ctx, *, keyword: str):
+async def nds(ctx, *, keyword: str) -> None:
     results = find_nds(keyword)
     await ctx.reply("\n".join(results))
 
-# ctx 範例
-@bot.command()
-async def greet(ctx):
-    await ctx.send(f"你好 {ctx.author.mention}！這是 {ctx.channel.name} 頻道")
 
-# 記得在 .env 或 config.py 中妥善保存 TOKEN
+@bot.command()
+async def greet(ctx) -> None:
+    await ctx.send(f"Hi {ctx.author.mention}, welcome to {ctx.channel.name}!")
+
+
 bot.run(TOKEN)

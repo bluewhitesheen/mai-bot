@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_JSON = BASE_DIR / "data.json"
 
 
-def format_song(song):
+def format_song(song) -> str:
     name = song.get("songId", "")
     artist = song.get("artist", "")
     version = song.get("version", "")
