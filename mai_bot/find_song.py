@@ -4,9 +4,6 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_JSON = BASE_DIR / "data.json"
 
-
-# ?¾ä??°internal level å°±å? level
-
 def get_level(sheet):
     level = sheet.get("internalLevelValue")
     if level is None:
@@ -56,8 +53,6 @@ def find_difficulties(song):
     return "\n".join(dif_results) if dif_results else "none"
 
 
-# ?ä»»ä?sheetä¸­ç? regions ??intl is true
-
 def IsIntl(song) -> bool:
     for sheet in song.get("sheets", []):
         if sheet.get("regions", {}).get("intl") == True:
@@ -65,28 +60,31 @@ def IsIntl(song) -> bool:
     return False
 
 
-# ?‰typeä¸æ˜¯utage ?½ä?ç®—å®´è­?
-
 def IsUtage(song) -> bool:
     for sheet in song.get("sheets", []):
         if not sheet.get("type", "") == "utage":
             return False
     return True
 
-
-
 def find_songs_by_keyword(keyword: str, json_path=DATA_JSON) -> list:
     with open(json_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    results = []
+    matches = []
+    keyword_lower = keyword.lower()
+
+    def sort_key(song_id: str):
+        sid = song_id.lower()
+        return (0 if sid.startswith(keyword_lower) else 1, sid)
+
     for song in data.get("songs", []):
         song_id = song.get("songId", "")
         difficulties = find_difficulties(song)
-        if keyword.lower() in song_id.lower() and IsIntl(song) and not IsUtage(song):
-            results.append(f"{song_id}\n{difficulties}")
-        if len(results) >= 20:
-            break
+        if keyword_lower in song_id.lower() and IsIntl(song) and not IsUtage(song):
+            matches.append((song_id, difficulties))
+
+    matches.sort(key=lambda item: sort_key(item[0]))
+    results = [f"{song_id}\n{difficulties}" for song_id, difficulties in matches[:20]]
 
     if not results:
         return ["No matches found"]
