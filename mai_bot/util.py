@@ -20,7 +20,7 @@ def is_utage(song) -> bool:
 
 
 def is_long(songName) -> bool:
-    if songName == "Xaleid?copiX" or songName == "Ref:rain (for 7th Heaven)":
+    if songName == "Xaleid◆scopiX" or songName == "Ref:rain (for 7th Heaven)":
         return True
     return False
 
