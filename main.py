@@ -15,18 +15,23 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
+client = bot
 
 
 @bot.event
 async def on_ready() -> None:
-    print(f"??{bot.user}")
+    print(f"{bot.user}")
 
+# @client.event
+# async def on_message(message) -> None:
+#     print(f"message={message.content}")
+#     await bot.process_commands(message)
 
 @bot.command(aliases=["f"])
 async def find(ctx, *, keyword: str) -> None:
+    print("keyword: ", keyword, len(keyword))
     results = find_songs_by_keyword(keyword)
     await ctx.reply("\n\n".join(results))
-
 
 @bot.command()
 async def find_simple(ctx, *, keyword: str) -> None:

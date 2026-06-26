@@ -1,15 +1,11 @@
 import json
 from pathlib import Path
+from typing import AbstractSet, Optional
+
+from mai_bot.util import get_level
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_JSON = BASE_DIR / "data.json"
-
-
-def get_level(sheet) -> str:
-    level = sheet.get("internalLevelValue")
-    if level is None:
-        level = sheet.get("level", "")
-    return str(level)
 
 
 def abbr_dif(sheet) -> str:
@@ -28,6 +24,35 @@ def abbr_dif(sheet) -> str:
         case _:
             d = "UNKNOWN"
     return d
+
+
+def find_difficulties(
+    song,
+    difficulty_filter: Optional[AbstractSet[str]] = None,
+) -> str:
+    dif_st = []
+    dif_dx = []
+    for sheet in song.get("sheets", []):
+        sheet_type = sheet.get("type", "")
+        difficulty = abbr_dif(sheet)
+        if difficulty_filter is not None and difficulty not in difficulty_filter:
+            continue
+        level = get_level(sheet)
+
+        if sheet_type == "std":
+            dif_st.append(f"{difficulty} {level}")
+        elif sheet_type == "dx":
+            dif_dx.append(f"{difficulty} {level}")
+
+    dif_results = []
+    if dif_st:
+        dif_st = dif_st[::-1]
+        dif_results.append("ST : " + " / ".join(dif_st))
+    if dif_dx:
+        dif_dx = dif_dx[::-1]
+        dif_results.append("DX : " + " / ".join(dif_dx))
+
+    return "\n".join(dif_results) if dif_results else "none"
 
 
 def get_type(sheet) -> str:

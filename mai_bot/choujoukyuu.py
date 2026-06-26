@@ -1,10 +1,10 @@
 import json
 import random
 from pathlib import Path
+from mai_bot.util import is_long, is_utage
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_JSON = BASE_DIR / "data.json"
-
 
 def abbr_dif(sheet) -> str:
     d = ""
@@ -30,10 +30,14 @@ def MasterChoujoukyuu(json_path: Path = DATA_JSON) -> list[str]:
 
     cjk_sheets = []
     for song in data.get("songs", []):
+        if is_utage(song): continue
+
         songName = song.get("songId", "")
+        if is_long(songName): continue
+
         for sheet in song.get("sheets", []):
             internalLevel = sheet.get("internalLevelValue", 0)
-            if 14.5 <= internalLevel <= 14.9 and not sheet.get("type", "") == "utage":
+            if 14.5 <= internalLevel <= 14.9:
                 diff = abbr_dif(sheet)
                 level = str(internalLevel)
                 entry = f"{songName} / {diff} ({level})"

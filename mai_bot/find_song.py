@@ -2,14 +2,10 @@ import json
 from pathlib import Path
 from typing import AbstractSet, Optional
 
+from mai_bot.util import get_level, is_intl, is_utage
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_JSON = BASE_DIR / "data.json"
-
-def get_level(sheet) -> str:
-    level = sheet.get("internalLevelValue")
-    if level is None:
-        level = sheet.get("level", "")
-    return str(level)
 
 
 def abbr_dif(sheet) -> str:
@@ -61,19 +57,6 @@ def find_difficulties(
     return "\n".join(dif_results) if dif_results else "none"
 
 
-def IsIntl(song) -> bool:
-    for sheet in song.get("sheets", []):
-        if sheet.get("regions", {}).get("intl") == True:
-            return True
-    return False
-
-
-def IsUtage(song) -> bool:
-    for sheet in song.get("sheets", []):
-        if not sheet.get("type", "") == "utage":
-            return False
-    return True
-
 def find_songs_by_keyword(
     keyword: str,
     difficulty_filter: Optional[AbstractSet[str]] = None,
@@ -92,7 +75,7 @@ def find_songs_by_keyword(
     for song in data.get("songs", []):
         song_id = song.get("songId", "")
         difficulties = find_difficulties(song, difficulty_filter=difficulty_filter)
-        if keyword_lower in song_id.lower() and IsIntl(song) and not IsUtage(song):
+        if keyword_lower in song_id.lower() and is_intl(song) and not is_utage(song):
             if difficulty_filter is not None and difficulties == "none":
                 continue
             matches.append((song_id, difficulties))
