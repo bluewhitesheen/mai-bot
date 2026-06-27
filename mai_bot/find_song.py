@@ -85,7 +85,7 @@ def find_songs_by_keyword(
     results = [f"{song_id}\n{difficulties}" for song_id, difficulties in matches[:max_results]]
 
     if len(matches) > max_results:
-        results.append("符合條件歌曲較長，僅顯示前五筆結果")
+        results.append("符合條件之歌曲數量較多，僅顯示前五筆結果")
 
     if not results:
         return ["No matches found"]
