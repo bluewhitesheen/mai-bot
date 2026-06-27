@@ -29,7 +29,6 @@ async def on_ready() -> None:
 
 @bot.command(aliases=["f"])
 async def find(ctx, *, keyword: str) -> None:
-    print("keyword: ", keyword, len(keyword))
     results = find_songs_by_keyword(keyword)
     await ctx.reply("\n\n".join(results))
 

@@ -81,7 +81,11 @@ def find_songs_by_keyword(
             matches.append((song_id, difficulties))
 
     matches.sort(key=lambda item: sort_key(item[0]))
-    results = [f"{song_id}\n{difficulties}" for song_id, difficulties in matches[:5]]
+    max_results = 5
+    results = [f"{song_id}\n{difficulties}" for song_id, difficulties in matches[:max_results]]
+
+    if len(matches) > max_results:
+        results.append("符合條件歌曲較長，僅顯示前五筆結果")
 
     if not results:
         return ["No matches found"]
