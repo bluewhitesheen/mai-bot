@@ -1,4 +1,4 @@
-def get_level(sheet) -> str:
+﻿def get_level(sheet) -> str:
     level = sheet.get("internalLevelValue")
     if level is None:
         level = sheet.get("level", "")
@@ -24,3 +24,34 @@ def is_long(songName) -> bool:
         return True
     return False
 
+def abbr_difficulty(sheet) -> str:
+    d = ""
+    match sheet.get("difficulty", ""):
+        case "basic":
+            d = "BAS"
+        case "advanced":
+            d = "ADV"
+        case "expert":
+            d = "EXP"
+        case "master":
+            d = "MAS"
+        case "remaster":
+            d = "Re:MAS"
+        case _:
+            d = "UNKNOWN"
+    return d
+
+def abbr_version(s) -> str:
+    return s.replace("でらっくす", "DX").replace(" PLUS", "+")
+
+
+def abbr_variety(s) -> str:
+    mapping = {
+        "POPS＆アニメ": "POPS＆ANIME",
+        "niconico＆ボーカロイド": "niconico＆VOCALOID",
+        "ゲーム＆バラエティ": "GAME＆VARIETY",
+        "オンゲキ＆CHUNITHM": "オンゲキ＆CHUNITHM",
+    }
+    if s not in mapping: 
+        return s
+    return mapping.get(s, s)

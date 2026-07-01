@@ -14,13 +14,15 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix = ["!", "！"], intents=intents)
 client = bot
 
 
 @bot.event
 async def on_ready() -> None:
     print(f"{bot.user}")
+    synced = await bot.tree.sync()
+    # print(f"synced {len(synced)} global commands")
 
 # @client.event
 # async def on_message(message) -> None:

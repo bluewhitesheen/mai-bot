@@ -2,31 +2,11 @@ import json
 from pathlib import Path
 from typing import AbstractSet, Optional
 
-from mai_bot.util import get_level, is_intl, is_utage
+from mai_bot.util import get_level, is_intl, is_utage, abbr_difficulty, abbr_version, abbr_variety
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_JSON = BASE_DIR / "data.json"
 
-
-def abbr_dif(sheet) -> str:
-    d = ""
-    match sheet.get("difficulty", ""):
-        case "basic":
-            d = "BAS"
-        case "advanced":
-            d = "ADV"
-        case "expert":
-            d = "EXP"
-        case "master":
-            d = "MAS"
-        case "remaster":
-            d = "Re:MAS"
-        case _:
-            d = "UNKNOWN"
-    return d
-
-
-# list all difficulties of this song
 
 def find_difficulties(
     song,
@@ -34,9 +14,11 @@ def find_difficulties(
 ) -> str:
     dif_st = []
     dif_dx = []
+    version = ""
     for sheet in song.get("sheets", []):
+        version = sheet.get("version", [])
         sheet_type = sheet.get("type", "")
-        difficulty = abbr_dif(sheet)
+        difficulty = abbr_difficulty(sheet)
         if difficulty_filter is not None and difficulty not in difficulty_filter:
             continue
         level = get_level(sheet)
@@ -49,10 +31,10 @@ def find_difficulties(
     dif_results = []
     if dif_st:
         dif_st = dif_st[::-1]
-        dif_results.append("ST : " + " / ".join(dif_st))
+        dif_results.append(f"ST({abbr_version(version)}): " + " / ".join(dif_st))
     if dif_dx:
         dif_dx = dif_dx[::-1]
-        dif_results.append("DX : " + " / ".join(dif_dx))
+        dif_results.append(f"DX({abbr_version(version)}): " + " / ".join(dif_dx))
 
     return "\n".join(dif_results) if dif_results else "none"
 
@@ -74,15 +56,16 @@ def find_songs_by_keyword(
 
     for song in data.get("songs", []):
         song_id = song.get("songId", "")
-        difficulties = find_difficulties(song, difficulty_filter=difficulty_filter)
+        song_variety = song.get("category", "")
         if keyword_lower in song_id.lower() and is_intl(song) and not is_utage(song):
+            difficulties = find_difficulties(song, difficulty_filter=difficulty_filter)
             if difficulty_filter is not None and difficulties == "none":
                 continue
-            matches.append((song_id, difficulties))
+            matches.append((song_id, song_variety, difficulties))
 
     matches.sort(key=lambda item: sort_key(item[0]))
     max_results = 5
-    results = [f"{song_id}\n{difficulties}" for song_id, difficulties in matches[:max_results]]
+    results = [f"{song_id} ({abbr_variety(song_variety)})\n{difficulties}" for song_id, song_variety, difficulties in matches[:max_results]]
 
     if len(matches) > max_results:
         results.append("符合條件之歌曲數量較多，僅顯示前五筆結果")
