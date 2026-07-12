@@ -14,9 +14,10 @@ def find_difficulties(
 ) -> str:
     dif_st = []
     dif_dx = []
-    version = ""
+    version_std = ""
+    version_dx = ""
     for sheet in song.get("sheets", []):
-        version = sheet.get("version", [])
+        version = sheet.get("version", "")
         sheet_type = sheet.get("type", "")
         difficulty = abbr_difficulty(sheet)
         if difficulty_filter is not None and difficulty not in difficulty_filter:
@@ -24,17 +25,21 @@ def find_difficulties(
         level = get_level(sheet)
 
         if sheet_type == "std":
+            if not version_std:
+                version_std = version
             dif_st.append(f"{difficulty} {level}")
         elif sheet_type == "dx":
+            if not version_dx:
+                version_dx = version
             dif_dx.append(f"{difficulty} {level}")
 
     dif_results = []
     if dif_st:
         dif_st = dif_st[::-1]
-        dif_results.append(f"ST({abbr_version(version)}): " + " / ".join(dif_st))
+        dif_results.append(f"ST({abbr_version(version_std)}): " + " / ".join(dif_st))
     if dif_dx:
         dif_dx = dif_dx[::-1]
-        dif_results.append(f"DX({abbr_version(version)}): " + " / ".join(dif_dx))
+        dif_results.append(f"DX({abbr_version(version_dx)}): " + " / ".join(dif_dx))
 
     return "\n".join(dif_results) if dif_results else "none"
 
