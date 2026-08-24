@@ -17,7 +17,8 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Deploy
+      - name: Check and update repository
+        id: check
         env:
           REPO_DIR: /home/terry/mai-bot
         run: |
@@ -40,16 +41,15 @@ jobs:
           echo "Fetching main..."
           git fetch origin main
 
-          echo "Checking whether update is needed..."
-
           NEW_SHA=$(git rev-parse origin/main)
+
+          echo "New SHA: $NEW_SHA"
 
           if [ "$OLD_SHA" = "$NEW_SHA" ]; then
             echo "Already up to date."
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-
-          echo "New SHA: $NEW_SHA"
 
           echo "Checking changed files..."
 
@@ -60,16 +60,26 @@ jobs:
           echo "Changed files:"
           printf '  %s\n' "${changed_files[@]}"
 
-          if [ "${#changed_files[@]}" -ne 1 ] || \
-             [ "${changed_files[0]}" != "data.json" ]; then
-            echo "Unexpected files changed."
-            exit 1
+          if [ "${#changed_files[@]}" -eq 1 ] && \
+             [ "${changed_files[0]}" = "data.json" ]; then
+            echo "Only data.json changed."
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Changes are not deployment-triggering."
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
           fi
-
-          echo "Only data.json changed."
 
           echo "Updating local repository..."
           git pull --ff-only origin main
+
+      - name: Docker down, build and run
+        if: steps.check.outputs.deploy == 'true'
+        env:
+          REPO_DIR: /home/terry/mai-bot
+        run: |
+          set -euo pipefail
+
+          cd "$REPO_DIR"
 
           echo "Stopping containers..."
           docker compose down
