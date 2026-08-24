@@ -1,0 +1,81 @@
+name: Deploy mai-bot
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Deploy
+        env:
+          REPO_DIR: /home/terry/mai-bot
+        run: |
+          set -euo pipefail
+
+          cd "$REPO_DIR"
+
+          echo "Checking local repository..."
+
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Working tree is not clean."
+            git status --short
+            exit 1
+          fi
+
+          OLD_SHA=$(git rev-parse HEAD)
+
+          echo "Old SHA: $OLD_SHA"
+
+          echo "Fetching main..."
+          git fetch origin main
+
+          echo "Checking whether update is needed..."
+
+          NEW_SHA=$(git rev-parse origin/main)
+
+          if [ "$OLD_SHA" = "$NEW_SHA" ]; then
+            echo "Already up to date."
+            exit 0
+          fi
+
+          echo "New SHA: $NEW_SHA"
+
+          echo "Checking changed files..."
+
+          mapfile -t changed_files < <(
+            git diff --name-only "$OLD_SHA" "$NEW_SHA"
+          )
+
+          echo "Changed files:"
+          printf '  %s\n' "${changed_files[@]}"
+
+          if [ "${#changed_files[@]}" -ne 1 ] || \
+             [ "${changed_files[0]}" != "data.json" ]; then
+            echo "Unexpected files changed."
+            exit 1
+          fi
+
+          echo "Only data.json changed."
+
+          echo "Updating local repository..."
+          git pull --ff-only origin main
+
+          echo "Stopping containers..."
+          docker compose down
+
+          echo "Building containers..."
+          docker compose build
+
+          echo "Starting containers..."
+          docker compose up -d
+
+          echo "Deployment completed."
