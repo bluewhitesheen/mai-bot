@@ -61,12 +61,13 @@ jobs:
           printf '  %s\n' "${changed_files[@]}"
 
           if [ "${#changed_files[@]}" -eq 1 ] && \
-             [ "${changed_files[0]}" = "data.json" ]; then
+              [ "${changed_files[0]}" = "data.json" ]; then
             echo "Only data.json changed."
             echo "deploy=true" >> "$GITHUB_OUTPUT"
           else
             echo "Changes are not deployment-triggering."
             echo "deploy=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
           echo "Updating local repository..."
