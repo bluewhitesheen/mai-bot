@@ -62,7 +62,7 @@ jobs:
           printf '  %s\n' "${changed_files[@]}"
 
           if [ "${#changed_files[@]}" -ne 1 ] || \
-             [ "${changed_files[0]}" != "data.json" ]; then
+              [ "${changed_files[0]}" != "data.json" ]; then
             echo "PR must contain only data.json."
             exit 1
           fi
@@ -79,10 +79,19 @@ jobs:
             echo "Invalid updateTime format."
             exit 1
           fi
+      
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.MAI_BOT_APP_ID }}
+          private-key: ${{ secrets.MAI_BOT_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: mai-bot
 
       - name: Enable auto merge
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
         run: |
