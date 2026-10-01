@@ -11,6 +11,11 @@ def is_intl(song) -> bool:
             return True
     return False
 
+def is_jp(song) -> bool:
+    for sheet in song.get("sheets", []):
+        if sheet.get("regions", {}).get("jp") == True:
+            return True
+    return False
 
 def is_utage(song) -> bool:
     for sheet in song.get("sheets", []):

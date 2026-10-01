@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import AbstractSet, Optional
 
-from mai_bot.util import get_level, is_intl, is_utage, abbr_difficulty, abbr_version, abbr_variety
+from mai_bot.util import get_level, is_intl, is_jp, is_utage, abbr_difficulty, abbr_version, abbr_variety
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_JSON = BASE_DIR / "data.json"
@@ -55,22 +55,34 @@ def find_songs_by_keyword(
     matches = []
     keyword_lower = keyword.lower()
 
-    def sort_key(song_id: str) -> tuple[int, str]:
-        sid = song_id.lower()
-        return (0 if sid.startswith(keyword_lower) else 1, sid)
 
     for song in data.get("songs", []):
         song_id = song.get("songId", "")
         song_variety = song.get("category", "")
-        if keyword_lower in song_id.lower() and is_intl(song) and not is_utage(song):
+        if keyword_lower in song_id.lower() and not is_utage(song):
             difficulties = find_difficulties(song, difficulty_filter=difficulty_filter)
             if difficulty_filter is not None and difficulties == "none":
                 continue
-            matches.append((song_id, song_variety, difficulties))
+            if is_intl(song):
+                matches.append((song_id, song_variety, difficulties, 0))
+            elif is_jp(song):
+                matches.append((song_id, song_variety, difficulties, 1))
 
-    matches.sort(key=lambda item: sort_key(item[0]))
+    def sort_key(song_id: str) -> tuple[int, str]:
+        sid = song_id.lower()
+        return (0 if sid.startswith(keyword_lower) else 1, sid)
+
+    # item list: [song_id, song_variety, difficulties, 0=intl/1=jp]
+    matches.sort(key=lambda item: (sort_key(item[0]), item[3]))
+
     max_results = 5
-    results = [f"{song_id} ({abbr_variety(song_variety)})\n{difficulties}" for song_id, song_variety, difficulties in matches[:max_results]]
+    results = []
+
+    for song_id, song_variety, difficulties, region_type in matches[:max_results]:
+        if region_type == 0:
+            results.append(f"{song_id} ({abbr_variety(song_variety)})\n{difficulties}")
+        elif region_type == 1:
+            results.append(f"[JAPAN_ONLY] {song_id} ({abbr_variety(song_variety)})\n{difficulties}")
 
     if len(matches) > max_results:
         results.append("符合條件之歌曲數量較多，僅顯示前五筆結果")
