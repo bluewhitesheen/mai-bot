@@ -96,8 +96,8 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-
+          
           gh pr merge "$PR_NUMBER" \
             --repo "$REPO" \
-            --auto \
-            --squash
+            --squash \
+            --delete-branch
