@@ -41,10 +41,21 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Generate GitHub App token
+        if: steps.diff.outputs.changed == 'true'
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.MAI_BOT_APP_ID }}
+          private-key: ${{ secrets.MAI_BOT_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: mai-bot
+
       - name: Open or update sync PR
         if: steps.diff.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ steps.app-token.outputs.token }}
           branch: chore/sync-data-json
           title: "chore: sync data.json"
           commit-message: "chore: sync data.json from CDN"
