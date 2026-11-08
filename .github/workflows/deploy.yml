@@ -73,7 +73,7 @@ jobs:
           echo "Updating local repository..."
           git pull --ff-only origin main
 
-      - name: Docker down, build and run
+      - name: Restart with new data.json
         if: steps.check.outputs.deploy == 'true'
         env:
           REPO_DIR: /home/terry/mai-bot
@@ -82,13 +82,8 @@ jobs:
 
           cd "$REPO_DIR"
 
-          echo "Stopping containers..."
-          docker compose down
-
-          echo "Building containers..."
-          docker compose build
-
-          echo "Starting containers..."
-          docker compose up -d
+          # data.json is bind-mounted, so recreating the container is enough
+          echo "Recreating containers..."
+          docker compose up -d --force-recreate
 
           echo "Deployment completed."
