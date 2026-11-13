@@ -7,6 +7,7 @@ from mai_bot.choujoukyuu import MasterChoujoukyuu
 from mai_bot.randomsong import random_song
 from mai_bot.note_designer import find_nd
 from mai_bot.note_designer_songs import find_nds
+from mai_bot.rating import rating_message
 import os
 
 load_dotenv()
@@ -84,6 +85,10 @@ async def nds(ctx, *, keyword: str) -> None:
 @bot.command()
 async def greet(ctx) -> None:
     await ctx.send(f"Hi {ctx.author.mention}, welcome to {ctx.channel.name}!")
+
+@bot.command(aliases=["rat"])
+async def rating(ctx, *, keyword: str) -> None:
+    await ctx.reply(rating_message(keyword))
 
 
 bot.run(TOKEN)
