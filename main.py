@@ -2,7 +2,7 @@
 from dotenv import load_dotenv
 from discord.ext import commands
 
-from mai_bot.find_song import find_songs_by_keyword
+from mai_bot.find_song import find_songs_by_keyword, NO_MATCH_MESSAGE
 from mai_bot.choujoukyuu import MasterChoujoukyuu
 from mai_bot.randomsong import random_song
 from mai_bot.note_designer import find_nd
@@ -25,10 +25,24 @@ async def on_ready() -> None:
     synced = await bot.tree.sync()
     # print(f"synced {len(synced)} global commands")
 
-# @client.event
-# async def on_message(message) -> None:
-#     print(f"message={message.content}")
-#     await bot.process_commands(message)
+QUICK_FIND_PREFIXES = ("! ", "！ ")
+
+
+@bot.event
+async def on_message(message: discord.Message) -> None:
+    if message.author.bot:
+        return
+
+    # "! 歌名" / "！ 歌名" 快速找歌；找不到時不回應，避免誤觸洗版
+    if message.content.startswith(QUICK_FIND_PREFIXES):
+        keyword = message.content[2:].strip()
+        if keyword:
+            results = find_songs_by_keyword(keyword)
+            if results != [NO_MATCH_MESSAGE]:
+                await message.reply("\n\n".join(results))
+        return
+
+    await bot.process_commands(message)
 
 @bot.command(aliases=["f"])
 async def find(ctx, *, keyword: str) -> None:

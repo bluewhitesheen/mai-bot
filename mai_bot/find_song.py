@@ -6,6 +6,7 @@ from mai_bot.util import get_level, is_intl, is_jp, is_utage, abbr_difficulty, a
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_JSON = BASE_DIR / "data.json"
+NO_MATCH_MESSAGE = "No matches found"
 
 
 def find_difficulties(
@@ -88,5 +89,5 @@ def find_songs_by_keyword(
         results.append("符合條件之歌曲數量較多，僅顯示前五筆結果")
 
     if not results:
-        return ["No matches found"]
+        return [NO_MATCH_MESSAGE]
     return results
