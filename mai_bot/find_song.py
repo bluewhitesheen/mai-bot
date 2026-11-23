@@ -86,7 +86,7 @@ def find_songs_by_keyword(
             results.append(f"[JAPAN_ONLY] {song_id} ({abbr_variety(song_variety)})\n{difficulties}")
 
     if len(matches) > max_results:
-        results.append("符合條件之歌曲數量較多，僅顯示前五筆結果")
+        results.append(f"符合條件之歌曲有 {len(matches)} 筆，僅顯示前五筆結果")
 
     if not results:
         return [NO_MATCH_MESSAGE]
