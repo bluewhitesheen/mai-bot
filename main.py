@@ -5,8 +5,6 @@ from discord.ext import commands
 from mai_bot.find_song import find_songs_by_keyword, NO_MATCH_MESSAGE
 from mai_bot.choujoukyuu import MasterChoujoukyuu
 from mai_bot.randomsong import random_song
-from mai_bot.note_designer import find_nd
-from mai_bot.note_designer_songs import find_nds
 from mai_bot.rating import rating_message
 import os
 
@@ -85,22 +83,10 @@ async def random(ctx) -> None:
 
 
 @bot.command()
-async def nd(ctx, *, keyword: str) -> None:
-    results = find_nd(keyword)
-    await ctx.reply("\n".join(results))
-
-
-@bot.command()
-async def nds(ctx, *, keyword: str) -> None:
-    results = find_nds(keyword)
-    await ctx.reply("\n".join(results))
-
-
-@bot.command()
 async def greet(ctx) -> None:
     await ctx.send(f"Hi {ctx.author.mention}, welcome to {ctx.channel.name}!")
 
-@bot.command(aliases=["rat"])
+@bot.command(aliases=["rat", "r"])
 async def rating(ctx, *, keyword: str) -> None:
     await ctx.reply(rating_message(keyword))
 
